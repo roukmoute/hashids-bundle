@@ -1,0 +1,26 @@
+{
+  "name": "roukmoute/hashids-bundle",
+  "type": "symfony-bundle",
+  "description": "Integrates hashids/hashids in a Symfony project",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Mathias STRASSER",
+      "email": "contact@roukmoute.fr"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Roukmoute\\HashidsBundle\\": "/src"
+    }
+  },
+  "require": {
+    "hashids/hashids": "^1.0"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.1-dev"
+    }
+  }
+}
