@@ -55,5 +55,26 @@ $hashids = $this->get('hashids');
 
 Next it's the same things of [official documentation][2]
 
+Hashids Converter
+===============
+
+Converter Name: `hashids.converter`
+
+The hashids converter attempts to convert request hashid attributes to a
+id for fetch a Doctrine entity. 
+
+For specify to use hashids converter just add `"id" = "hashid"` in 
+options.
+
+```php
+/**
+ * @Route("/users/{hashid}")
+ * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"id" = "hashid"})
+ */
+public function getAction(User $user)
+{
+}
+```
+
 [1]: https://github.com/ivanakimov/hashids.php
 [2]: http://hashids.org/php/
