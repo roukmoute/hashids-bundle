@@ -1,3 +1,5 @@
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/e79d4122-c9ad-454f-a1ac-981dd683144f/mini.png)](https://insight.sensiolabs.com/projects/e79d4122-c9ad-454f-a1ac-981dd683144f)
+
 # HashidsBundle
 
 Integrates [hashids/hashids][1] in a Symfony2 project. 
