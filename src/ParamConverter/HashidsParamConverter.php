@@ -43,7 +43,13 @@ class HashidsParamConverter extends DoctrineParamConverter implements ParamConve
         $request->attributes->set('id', $id);
         unset($options['id']);
         $configuration->setOptions($options);
+        $configuration->setIsOptional(true);
         parent::apply($request, $configuration);
+        
+        $name = $configuration->getName();
+        if (!$request->attributes->get($name)) {
+            throw new \LogicException(sprintf('%s "%s" not found.', ucfirst($name), $hashid));
+        }
 
         return true;
     }
