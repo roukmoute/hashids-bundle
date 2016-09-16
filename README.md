@@ -78,5 +78,19 @@ public function getAction(User $user)
 }
 ```
 
+You could have several hashids one the same URL.
+Just finish your word option with "hashid":
+
+```php
+/**
+ * @Route("/users/{userHashid}/status/{statusHashid}")
+ * @ParamConverter("user", class="Shippeo\Model\Entity\User", options={"id" = "userHashid"})
+ * @ParamConverter("status", class="Shippeo\Model\Entity\User\Notification", options={"id" = "statusHashid"})
+ */
+public function getAction(User $user, Status $status)
+{
+}
+```
+
 [1]: https://github.com/ivanakimov/hashids.php
 [2]: http://hashids.org/php/

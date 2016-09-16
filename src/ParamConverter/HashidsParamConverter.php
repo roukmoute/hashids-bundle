@@ -28,11 +28,11 @@ class HashidsParamConverter extends DoctrineParamConverter implements ParamConve
     {
         $options = $configuration->getOptions();
 
-        if (!isset($options['id']) || $options['id'] !== 'hashid') {
+        if (!isset($options['id']) || mb_strtolower(mb_substr($options['id'], -6)) !== 'hashid') {
             return false;
         }
 
-        $hashid = $request->attributes->get('hashid');
+        $hashid = $request->attributes->get($options['id']);
         $decodeHashids = $this->hashids->decode($hashid);
         if (!is_array($decodeHashids)
             || !isset($decodeHashids[0])
