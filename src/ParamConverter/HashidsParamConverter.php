@@ -32,7 +32,8 @@ class HashidsParamConverter extends DoctrineParamConverter implements ParamConve
             return false;
         }
 
-        $decodeHashids = $this->hashids->decode($request->attributes->get('hashid'));
+        $hashid = $request->attributes->get('hashid');
+        $decodeHashids = $this->hashids->decode($hashid);
         if (!is_array($decodeHashids)
             || !isset($decodeHashids[0])
             || false === ($id = $decodeHashids[0])
