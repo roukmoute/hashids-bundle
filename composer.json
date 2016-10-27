@@ -16,7 +16,7 @@
     }
   },
   "require": {
-    "hashids/hashids": "^1.0"
+    "hashids/hashids": "^2.0@dev"
   },
   "extra": {
     "branch-alias": {
