@@ -2,7 +2,8 @@
 
 # HashidsBundle
 
-Integrates [hashids/hashids][1] in a Symfony2 project. 
+Integrates [hashids/hashids][1] in a Symfony2 project.
+
 ## Installation
 
 Open a command console, enter your project directory and execute the
@@ -55,7 +56,7 @@ roukmoute_hashids:
 $hashids = $this->get('hashids');
 ```
 
-Next it's the same things of [official documentation][2]
+Next it's the same things of [official documentation][2].
 
 Hashids Converter
 ===============
@@ -84,8 +85,8 @@ Just finish your word option with "hashid":
 ```php
 /**
  * @Route("/users/{userHashid}/status/{statusHashid}")
- * @ParamConverter("user", class="Shippeo\Model\Entity\User", options={"id" = "userHashid"})
- * @ParamConverter("status", class="Shippeo\Model\Entity\User\Notification", options={"id" = "statusHashid"})
+ * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"id" = "userHashid"})
+ * @ParamConverter("status", class="RoukmouteBundle\Entity\Notification", options={"id" = "statusHashid"})
  */
 public function getAction(User $user, Status $status)
 {
