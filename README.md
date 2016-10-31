@@ -58,6 +58,17 @@ $hashids = $this->get('hashids');
 
 Next it's the same things of [official documentation][2].
 
+## Other Features
+
+The `Roukmoute\HashidsBundle\Hashids` has extra features:
+
+```php
+$minHashLength = 42;
+
+// Edit the minimum hash length.
+$this->get('hashids')->setMinHashLength($minHashLength)->encode(1, 2, 3);
+```
+
 Hashids Converter
 ===============
 
