@@ -67,6 +67,9 @@ $minHashLength = 42;
 
 // Edit the minimum hash length.
 $this->get('hashids')->setMinHashLength($minHashLength)->encode(1, 2, 3);
+
+// Encode with a custom minimum hash length.
+$this->get('hashids')->encodeWithCustomHashLength($minHashLength, 1, 2, 3);
 ```
 
 Hashids Converter
