@@ -5,7 +5,7 @@
 
     <services>
         <service id="hashids"
-                 class="Hashids\Hashids"
+                 class="Roukmoute\HashidsBundle\Hashids"
         >
             <argument>%hashids.salt%</argument>
             <argument>%hashids.min_hash_length%</argument>
