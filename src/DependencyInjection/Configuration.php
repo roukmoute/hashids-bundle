@@ -24,7 +24,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('alphabet')
                     ->info('if set, will use only characters of alphabet string')
-                    ->defaultValue('')
+                    ->defaultValue('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
                 ->end()
             ->end();
 

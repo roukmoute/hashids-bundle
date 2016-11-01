@@ -47,7 +47,7 @@ roukmoute_hashids:
     min_hash_length:    0
 
     # if set, will use only characters of alphabet string
-    alphabet:           ""
+    alphabet:           "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 ```
 
 ## Usage
