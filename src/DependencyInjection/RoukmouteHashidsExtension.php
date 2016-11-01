@@ -19,5 +19,6 @@ class RoukmouteHashidsExtension extends Extension
         $container->setParameter('hashids.salt', $config['salt']);
         $container->setParameter('hashids.min_hash_length', $config['min_hash_length']);
         $container->setParameter('hashids.alphabet', $config['alphabet']);
+        $container->setParameter('hashids.autowire', $config['autowire']);
     }
 }

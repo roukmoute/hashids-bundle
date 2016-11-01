@@ -48,6 +48,9 @@ roukmoute_hashids:
 
     # if set, will use only characters of alphabet string
     alphabet:           "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+
+    # if set to true, guess automatically hashid
+    autowire:           false
 ```
 
 ## Usage
@@ -73,7 +76,7 @@ $this->get('hashids')->encodeWithCustomHashLength($minHashLength, 1, 2, 3);
 ```
 
 Hashids Converter
-===============
+=================
 
 Converter Name: `hashids.converter`
 
@@ -106,6 +109,58 @@ public function getAction(User $user, Status $status)
 {
 }
 ```
+
+Defining Hashid Automatically (Autowiring)
+==========================================
+
+Autowiring allows to guess hashid with minimal configuration.
+It automatically resolves the variable in route.
+The ParamConverter component will be able to automatically guess
+the hashid when configuration has autowire to true.
+
+```
+roukmoute_hashids:
+    autowire: true
+```
+
+The autowiring subsystem will detect the hashid.
+
+Base on the example above:
+
+```php
+/**
+ * @Route("/users/{hashid}")
+ * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"id" = "hashid"})
+ */
+public function getAction(User $user)
+{
+}
+```
+
+Now you can do simply that:
+
+```php
+/**
+ * @Route("/users/{hashid}")
+ */
+public function getAction(User $user)
+{
+}
+```
+
+Or can directly use `id` now !
+
+```php
+/**
+ * @Route("/users/{id}")
+ */
+public function getAction(User $user)
+{
+}
+```
+
+As you can see, the autowiring feature reduces the amount of 
+configuration required to define a hashid.
 
 [1]: https://github.com/ivanakimov/hashids.php
 [2]: http://hashids.org/php/
