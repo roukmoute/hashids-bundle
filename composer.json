@@ -17,7 +17,7 @@
   },
   "require": {
     "php": ">=5.6",
-    "hashids/hashids": "^2.0@dev"
+    "hashids/hashids": "^2.0"
   },
   "extra": {
     "branch-alias": {
