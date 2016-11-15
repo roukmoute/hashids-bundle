@@ -2,7 +2,7 @@
 
 namespace Roukmoute\HashidsBundle;
 
-final class Hashids extends \Hashids\Hashids
+class Hashids extends \Hashids\Hashids
 {
     /**
      * Sets the minimum hash length.
