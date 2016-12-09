@@ -99,7 +99,7 @@ class HashidsParamConverter extends DoctrineParamConverter implements ParamConve
         $name = $configuration->getName();
 
         if (!$request->attributes->get($name)) {
-            throw new \LogicException(sprintf('%s "%s" not found.', ucfirst($name), $hashid));
+            throw new NotFoundHttpException(sprintf('%s "%s" not found.', ucfirst($name), $hashid));
         }
 
         return true;
