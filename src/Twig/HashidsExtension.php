@@ -7,7 +7,7 @@ use Roukmoute\HashidsBundle\Hashids;
 class HashidsExtension extends \Twig_Extension
 {
     /**
-     * @var \Hashids\Hashids;
+     * @var Hashids
      */
     private $hashids;
 
@@ -15,6 +15,7 @@ class HashidsExtension extends \Twig_Extension
     {
         $this->hashids = $hashids;
     }
+
     public function getFilters()
     {
         return [
