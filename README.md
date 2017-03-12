@@ -1,4 +1,4 @@
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/e79d4122-c9ad-454f-a1ac-981dd683144f/mini.png)](https://insight.sensiolabs.com/projects/e79d4122-c9ad-454f-a1ac-981dd683144f)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/e79d4122-c9ad-454f-a1ac-981dd683144f/mini.png)](https://insight.sensiolabs.com/projects/e79d4122-c9ad-454f-a1ac-981dd683144f) [![Scrutinizer](https://scrutinizer-ci.com/g/roukmoute/HashidsBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/roukmoute/HashidsBundle/)
 
 # HashidsBundle
 
