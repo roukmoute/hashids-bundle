@@ -20,5 +20,10 @@
             <argument>%hashids.autowire%</argument>
             <tag name="request.param_converter" priority="1" converter="hashids.converter" />
         </service>
+
+        <service id="hashids.twig.extension" class="Roukmoute\HashidsBundle\Twig\HashidsExtension">
+            <argument type="service" id="hashids" />
+            <tag name="twig.extension" />
+        </service>
     </services>
 </container>

@@ -162,5 +162,12 @@ public function getAction(User $user)
 As you can see, the autowiring feature reduces the amount of 
 configuration required to define a hashid.
 
+# Twig Extension
+## Usage
+```twig
+{{ path('users.show', {'hashid': user.id | hashids_encode }) }}
+{{ app.request.query.get('hashid') | hashids_decode }}
+```
+
 [1]: https://github.com/ivanakimov/hashids.php
 [2]: http://hashids.org/php/
