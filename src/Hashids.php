@@ -28,11 +28,49 @@ class Hashids extends \Hashids\Hashids
      */
     public function encodeWithCustomHashLength($minHashLength, ...$numbers)
     {
-        $minHashLengthBak = $this->minHashLength;
-        $this->minHashLength = (int) $minHashLength;
+        $newHashLength = $this->updateMinHashLength($minHashLength);
         $hashids = $this->encode($numbers);
-        $this->minHashLength = $minHashLengthBak;
+        $this->restoreMinHashLength($newHashLength);
 
         return $hashids;
+    }
+
+    /**
+     * Decode parameter to generate a decoded hash with custom minimum hash length.
+     *
+     * @param int    $minHashLength  The minimum hash length.
+     * @param string $hash           parameters to encode
+     *
+     * @return array
+     */
+    public function decodeWithCustomHashLength($minHashLength, $hash)
+    {
+        $originalHashLength = $this->updateMinHashLength($minHashLength);
+        $hashids = $this->decode($hash);
+        $this->restoreMinHashLength($originalHashLength);
+
+        return $hashids;
+    }
+
+    /**
+     * @param string $newMinHashLength
+     *
+     * @return int
+     */
+    protected function updateMinHashLength($newMinHashLength)
+    {
+        $originalMinHashLength = $this->minHashLength;
+
+        $this->minHashLength = (int) $newMinHashLength;
+
+        return $originalMinHashLength;
+    }
+
+    /**
+     * @param string $originalMinHashLength
+     */
+    protected function restoreMinHashLength($originalMinHashLength)
+    {
+        $this->minHashLength = $originalMinHashLength;
     }
 }
