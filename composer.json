@@ -20,6 +20,9 @@
     "hashids/hashids": "^2.0",
     "sensio/framework-extra-bundle": "^3.0"
   },
+  "require-dev": {
+    "phpspec/phpspec": "^4.0"
+  },
   "extra": {
     "branch-alias": {
       "dev-master": "1.5-dev"
