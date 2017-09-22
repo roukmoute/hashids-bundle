@@ -21,12 +21,17 @@
     "sensio/framework-extra-bundle": "^3.0"
   },
   "require-dev": {
-    "phpspec/phpspec": "^4.0"
+    "bossa/phpspec2-expect": "^3.0",
+    "phpspec/phpspec": "^4.0",
+    "twig/twig": "^2.4"
   },
   "extra": {
     "branch-alias": {
       "dev-master": "1.5-dev"
     }
+  },
+  "suggest": {
+    "twig/twig": "Allows to use hashids in Twig template engine"
   },
   "config": {
     "preferred-install": {
