@@ -41,14 +41,7 @@ class HashidsParamConverter extends DoctrineParamConverter implements ParamConve
             try {
                 return parent::apply($request, $configuration);
             } catch (\Exception $exception) {
-                $name = $configuration->getName();
-                $options = $this->getOptions($configuration);
-
-                if ($exception instanceof NotFoundHttpException) {
-                    $hashid = $this->getIdentifier($request, $options, $name);
-                } else {
-                    $hashid = $this->getHashIdentifier($request, $options, $name);
-                }
+                $hashid = $this->hashIdentifier($request, $configuration);
             }
         } else {
             $options = $configuration->getOptions();
@@ -107,19 +100,22 @@ class HashidsParamConverter extends DoctrineParamConverter implements ParamConve
 
     /**
      * @param Request $request
-     * @param $options
-     * @param $name
+     * @param ParamConverter $configuration
      *
-     * @return array|bool|mixed
+     * @return string
      */
-    private function getHashIdentifier(Request $request, $options, $name)
+    private function hashIdentifier(Request $request, ParamConverter $configuration)
     {
-        $id = $this->getIdentifier($request, $options, $name);
+        $name = $configuration->getName();
+        $options = $this->getOptions($configuration);
 
-        if (!$id && $request->attributes->has('hashid')) {
-            return $request->attributes->get('hashid');
+        $hashid = $this->getIdentifier($request, $options, $name);
+
+        if (!$hashid && $request->attributes->has('hashid')) {
+            $hashid = $request->attributes->get('hashid');
         }
 
-        return $id;
+        return $hashid;
     }
+
 }
