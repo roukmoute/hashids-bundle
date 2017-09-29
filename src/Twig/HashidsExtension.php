@@ -24,11 +24,6 @@ class HashidsExtension extends \Twig_Extension
         ];
     }
 
-    public function getName()
-    {
-        return 'hashids_extension';
-    }
-
     public function encode($number)
     {
         return $this->hashids->encode($number);
