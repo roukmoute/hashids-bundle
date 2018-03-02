@@ -24,6 +24,7 @@
   },
   "require-dev": {
     "bossa/phpspec2-expect": "^3.0",
+    "doctrine/orm": "^2.6",
     "phpspec/phpspec": "^4.0",
     "twig/twig": "^2.4"
   },
