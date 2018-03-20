@@ -3,7 +3,10 @@
 namespace spec\Roukmoute\HashidsBundle;
 
 use PhpSpec\ObjectBehavior;
+use Roukmoute\HashidsBundle\DependencyInjection\RoukmouteHashidsExtension;
 use Roukmoute\HashidsBundle\Hashids;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class HashidsSpec extends ObjectBehavior
 {
@@ -33,5 +36,13 @@ class HashidsSpec extends ObjectBehavior
         expect($this->decode('jR')->getWrappedObject())->toBe([1]);
         expect($this->decodeWithCustomHashLength(4, 'ejRe')->getWrappedObject())->toBe([1]);
         expect($this->decode('jR')->getWrappedObject())->toBe([1]);
+    }
+
+    public function it_has_public_visibility_for_hashid_service()
+    {
+        $container = new ContainerBuilder(new ParameterBag([]));
+        (new RoukmouteHashidsExtension())->load([[]], $container);
+
+        expect($container->getDefinition('hashids')->isPublic())->toBe(true);
     }
 }
