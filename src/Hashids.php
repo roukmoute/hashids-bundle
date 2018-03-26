@@ -1,75 +1,48 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Roukmoute\HashidsBundle;
 
 class Hashids extends \Hashids\Hashids
 {
     /**
      * Sets the minimum hash length.
-     *
-     * @param int $minHashLength The minimum hash length.
-     *
-     * @return $this
      */
-    public function setMinHashLength($minHashLength)
+    public function setMinHashLength(int $minHashLength): void
     {
-        $this->minHashLength = (int) $minHashLength;
-
-        return $this;
+        $this->minHashLength = $minHashLength;
     }
 
     /**
      * Encode parameters to generate a hash with custom minimum hash length.
      *
-     * @param int   $minHashLength  The minimum hash length.
-     * @param array ...$numbers     parameters to encode
-     *
-     * @return string
+     * @param array ...$numbers parameters to encode
      */
-    public function encodeWithCustomHashLength($minHashLength, ...$numbers)
+    public function encodeWithCustomHashLength(int $minHashLength, int ...$numbers): string
     {
-        $newHashLength = $this->updateMinHashLength($minHashLength);
+        $originalHashLength = $this->minHashLength;
+        $this->setMinHashLength($minHashLength);
         $hashids = $this->encode($numbers);
-        $this->restoreMinHashLength($newHashLength);
-
-        return $hashids;
-    }
-
-    /**
-     * Decode parameter to generate a decoded hash with custom minimum hash length.
-     *
-     * @param int    $minHashLength  The minimum hash length.
-     * @param string $hash           parameters to encode
-     *
-     * @return array
-     */
-    public function decodeWithCustomHashLength($minHashLength, $hash)
-    {
-        $originalHashLength = $this->updateMinHashLength($minHashLength);
-        $hashids = $this->decode($hash);
         $this->restoreMinHashLength($originalHashLength);
 
         return $hashids;
     }
 
     /**
-     * @param string $newMinHashLength
-     *
-     * @return int
+     * Decode parameter to generate a decoded hash with custom minimum hash length.
      */
-    protected function updateMinHashLength($newMinHashLength)
+    public function decodeWithCustomHashLength(int $minHashLength, string $hash): array
     {
-        $originalMinHashLength = $this->minHashLength;
+        $originalHashLength = $this->minHashLength;
+        $this->setMinHashLength($minHashLength);
+        $hashids = $this->decode($hash);
+        $this->restoreMinHashLength($originalHashLength);
 
-        $this->minHashLength = (int) $newMinHashLength;
-
-        return $originalMinHashLength;
+        return $hashids;
     }
 
-    /**
-     * @param string $originalMinHashLength
-     */
-    protected function restoreMinHashLength($originalMinHashLength)
+    protected function restoreMinHashLength(int $originalMinHashLength): void
     {
         $this->minHashLength = $originalMinHashLength;
     }

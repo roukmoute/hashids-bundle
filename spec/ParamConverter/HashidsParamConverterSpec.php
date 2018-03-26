@@ -15,198 +15,77 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class HashidsParamConverterSpec extends ObjectBehavior
 {
-    public function it_is_initializable(Hashids $hashids, ManagerRegistry $registry)
+    public function let()
     {
-        $this->beConstructedWith($hashids, $registry, false);
+        $this->beConstructedWith(new Hashids(), false);
+    }
+
+    public function it_is_initializable(Hashids $hashids)
+    {
+        $this->beConstructedWith($hashids, false);
 
         $this->shouldHaveType(HashidsParamConverter::class);
     }
 
-    public function it_returns_false_when_id_cannot_be_founded(
-        Hashids $hashids,
-        ManagerRegistry $registry,
-        Request $request,
-        ParamConverter $configuration
-    ) {
-        $this->beConstructedWith($hashids, $registry, false);
+    public function it_hashes_when_hashid_is_in_request()
+    {
+        $request = new Request([], [], ['hashid' => '9x']);
+        $configuration = new ParamConverter([]);
+        $configuration->setName('controllerArgument');
 
-        $configuration->getOptions()->willReturn([]);
+        $this->apply($request, $configuration)->shouldReturn(true);
+        expect($request->attributes->get('controllerArgument'))->toBe(42);
+    }
+
+    public function it_hashes_when_id_is_in_request()
+    {
+        $request = new Request([], [], ['id' => '9x']);
+        $configuration = new ParamConverter([]);
+        $configuration->setName('controllerArgument');
+
+        $this->apply($request, $configuration)->shouldReturn(true);
+        expect($request->attributes->get('controllerArgument'))->toBe(42);
+    }
+
+    public function it_hashes_when_hashid_is_in_ParamConverter_options()
+    {
+        $request = new Request([], [], ['slug' => '9x']);
+        $configuration = new ParamConverter(['options' => ['hashid' => 'slug']]);
+        $configuration->setName('controllerArgument');
+
+        $this->apply($request, $configuration)->shouldReturn(true);
+        expect($request->attributes->get('controllerArgument'))->toBe(42);
+    }
+
+    public function it_does_not_hash_when_there_is_no_hashid()
+    {
+        $request = new Request([], [], ['hashid' => 'not_an_hashid']);
+        $configuration = new ParamConverter([]);
+        $configuration->setName('controllerArgument');
+
+        $this->apply($request, $configuration)->shouldReturn(true);
+        expect($request->attributes->get('controllerArgument'))->toBe(null);
+    }
+
+    public function it_passthrough_when_argument_is_true(Hashids $hashids)
+    {
+        $this->beConstructedWith($hashids, true);
+
+        $request = new Request();
+        $configuration = new ParamConverter([]);
+        $configuration->setName('controllerArgument');
 
         $this->apply($request, $configuration)->shouldReturn(false);
     }
 
-    public function it_throws_a_LogicException_when_hashid_cannot_be_guessed(
-        Hashids $hashids,
-        ManagerRegistry $registry
-    ) {
-        $this->beConstructedWith($hashids, $registry, false);
+    public function it_does_not_passthrough_when_argument_is_false(Hashids $hashids)
+    {
+        $this->beConstructedWith($hashids, false);
 
         $request = new Request();
-        $request->attributes->set('hashid', 'h45h1d5');
-
-        $configuration = new ParamConverter(
-            [
-                'name' => 'user',
-                'class' => 'Roukmoute\User',
-                'options' => [
-                    'id' => 'hashid',
-                ],
-            ]
-        );
-
-        $this->shouldThrow(new \LogicException('Unable to guess hashid from the request information.'))
-            ->during(
-                'apply',
-                [$request, $configuration]
-            )
-        ;
-    }
-
-    public function it_throws_a_NotFoundHttpException_when_object_cannot_be_resolved(
-        Hashids $hashids,
-        ManagerRegistry $registry,
-        ObjectManager $manager,
-        ObjectRepository $repository
-    ) {
-        $this->beConstructedWith($hashids, $registry, false);
-
-        $class = 'Roukmoute\User';
-        $repository->find(1)->willReturn();
-        $manager->getRepository($class)->willReturn($repository);
-        $registry->getManagerForClass($class)->willReturn($manager);
-        $hash = 'h45h1d5';
-        $hashids->decode($hash)->willReturn([1]);
-
-        $request = new Request();
-        $request->attributes->set('hashid', $hash);
-
-        $configuration = new ParamConverter(
-            [
-                'name' => 'user',
-                'class' => $class,
-                'options' => [
-                    'id' => 'hashid',
-                ],
-            ]
-        );
-
-        $this->shouldThrow(new NotFoundHttpException('User "' . $hash . '" not found.'))
-            ->during(
-                'apply',
-                [$request, $configuration]
-            )
-        ;
-    }
-
-    public function it_applies_an_id_without_autowire(
-        Hashids $hashids,
-        ManagerRegistry $registry,
-        ObjectManager $manager,
-        ObjectRepository $repository
-    ) {
-        $this->beConstructedWith($hashids, $registry, false);
-
-        $class = 'Roukmoute\User';
-        $repository->find(1)->willReturn(new \stdClass());
-        $manager->getRepository($class)->willReturn($repository);
-        $registry->getManagerForClass($class)->willReturn($manager);
-        $hashids->decode('h45h1d5')->willReturn([1]);
-
-        $request = new Request();
-        $request->attributes->set('hashid', 'h45h1d5');
-
-        $configuration = new ParamConverter(
-            [
-                'name' => 'user',
-                'class' => $class,
-                'options' => [
-                    'id' => 'hashid',
-                ],
-            ]
-        );
+        $configuration = new ParamConverter([]);
+        $configuration->setName('controllerArgument');
 
         $this->apply($request, $configuration)->shouldReturn(true);
-    }
-
-    public function it_applies_an_id_with_autowire(
-        Hashids $hashids,
-        ManagerRegistry $registry,
-        ObjectManager $manager,
-        ObjectRepository $repository
-    ) {
-        $this->beConstructedWith($hashids, $registry, true);
-
-        $class = 'Roukmoute\User';
-        $repository->find(1)->willReturn(new \stdClass());
-        $manager->getRepository($class)->willReturn($repository);
-        $registry->getManagerForClass($class)->willReturn($manager);
-        $hashids->decode('h45h1d5')->willReturn([1]);
-
-        $request = new Request();
-        $request->attributes->set('hashid', 'h45h1d5');
-
-        $configuration = new ParamConverter(
-            [
-                'name' => 'user',
-                'class' => $class,
-            ]
-        );
-
-        $this->apply($request, $configuration)->shouldReturn(true);
-    }
-
-    public function it_applies_an_hashid_with_autowire(
-        Hashids $hashids,
-        ManagerRegistry $registry,
-        ObjectManager $manager,
-        ObjectRepository $repository
-    ) {
-        $this->beConstructedWith($hashids, $registry, true);
-
-        $class = 'Roukmoute\User';
-        $repository->find('h45h1d5')->willReturn();
-        $repository->find(1)->willReturn(new \stdClass());
-        $manager->getRepository($class)->willReturn($repository);
-        $registry->getManagerForClass($class)->willReturn($manager);
-        $hashids->decode('h45h1d5')->willReturn([1]);
-
-        $request = new Request();
-        $request->attributes->set('id', 'h45h1d5');
-
-        $configuration = new ParamConverter(
-            [
-                'name' => 'user',
-                'class' => $class,
-            ]
-        );
-
-        $this->apply($request, $configuration)->shouldReturn(true);
-    }
-
-    public function it_throws_a_LogicException_when_object_cannot_be_guessed_with_autowire(
-        Hashids $hashids,
-        ManagerRegistry $registry,
-        ObjectManager $manager,
-        ObjectRepository $repository,
-        ClassMetadata $classMetadata
-    ) {
-        $this->beConstructedWith($hashids, $registry, true);
-
-        $class = 'Roukmoute\User';
-        $manager->getRepository($class)->willReturn($repository);
-        $manager->getClassMetadata($class)->willReturn($classMetadata);
-        $registry->getManagerForClass($class)->willReturn($manager);
-
-        $request = new Request();
-        $request->attributes->set('hashid', 'h45h1d5');
-
-        $configuration = new ParamConverter(
-            [
-                'name' => 'user',
-                'class' => $class,
-            ]
-        );
-
-        $this->shouldThrow(\LogicException::class)->during('apply', [$request, $configuration]);
     }
 }

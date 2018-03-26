@@ -17,8 +17,7 @@
                  class="Roukmoute\HashidsBundle\ParamConverter\HashidsParamConverter"
         >
             <argument type="service" id="hashids"/>
-            <argument type="service" id="doctrine"/>
-            <argument>%hashids.autowire%</argument>
+            <argument>%hashids.passthrough%</argument>
             <tag name="request.param_converter" priority="1" converter="hashids.converter" />
         </service>
 
