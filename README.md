@@ -2,55 +2,58 @@
 
 # HashidsBundle
 
-Integrates [hashids/hashids][1] in a Symfony2 project.
+Integrates [hashids/hashids](https://github.com/ivanakimov/hashids.php) in a Symfony project.
 
-## Installation
+## Installation using composer
 
-Open a command console, enter your project directory and execute the
-following command to download the latest stable version of this bundle:
+These commands requires you to have Composer installed globally.  
+Open a command console, enter your project directory and execute the following 
+commands to download the latest stable version of this bundle:
+
+### Using Symfony Flex
+
+```
+    composer config extra.symfony.allow-contrib true
+    composer req roukmoute/hashids-bundle
+```
+
+### Using Symfony 4 Framework
 
 ```
     composer require roukmoute/hashids-bundle
 ```
 
-This command requires you to have Composer installed globally.
-
-## Enable the Bundle
-
-Then, enable the bundle by adding the following line in the ``app/AppKernel.php``
-file of your project:
+If this has not been done automatically, enable the bundle by adding the 
+following line in the `config/bundles.php` file of your project:
 
 ```php
 <?php
-// app/AppKernel.php
-class AppKernel extends Kernel
-{
-    public function registerBundles()
-    {
-        $bundles = array(
-            // …
-            new Roukmoute\HashidsBundle\RoukmouteHashidsBundle()
-        );
-        // …
+
+return [
+    …,
+    Roukmoute\HashidsBundle\RoukmouteHashidsBundle::class => ['all' => true],
+];
 ```
 
-The configuration looks as follows :
+## Configuration
+
+The configuration (`config/packages/roukmoute_hashids.yaml`) looks as follows :
 
 ```yaml
 roukmoute_hashids:
 
     # if set, the hashids will differ from everyone else's
-    salt:               ""
+    salt:            ""
 
     # if set, will generate minimum length for the id
     # 0 — meaning hashes will be the shortest possible length
-    min_hash_length:    0
+    min_hash_length: 0
 
     # if set, will use only characters of alphabet string
-    alphabet:           "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+    alphabet:        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 
-    # if set to true, guess automatically hashid
-    autowire:           false
+    # if set to true, it will continue with the next available param converters
+    passthrough:     false
 ```
 
 ## Usage
@@ -59,7 +62,7 @@ roukmoute_hashids:
 $hashids = $this->get('hashids');
 ```
 
-Next it's the same things of [official documentation][2].
+Next it's the same things of [official documentation](http://hashids.org/php/).
 
 ## Other Features
 
@@ -75,99 +78,91 @@ $this->get('hashids')->setMinHashLength($minHashLength)->encode(1, 2, 3);
 $this->get('hashids')->encodeWithCustomHashLength($minHashLength, 1, 2, 3);
 ```
 
-Hashids Converter
-=================
+## Hashids Converter
 
 Converter Name: `hashids.converter`
 
-The hashids converter attempts to convert request hashid attributes to a
-id for fetch a Doctrine entity. 
+The hashids converter attempts to convert `hashid`/`id` attribute set in the route into an integer parameter.
 
-For specify to use hashids converter just add `"id" = "hashid"` in 
-options.
+You could use `hashid` or `id` to add :
 
 ```php
 /**
  * @Route("/users/{hashid}")
- * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"id" = "hashid"})
  */
-public function getAction(User $user)
+public function getAction(int $user)
 {
 }
 ```
 
-You could have several hashids one the same URL.
-Just finish your word option with "hashid":
+or
 
 ```php
 /**
- * @Route("/users/{userHashid}/status/{statusHashid}")
- * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"id" = "userHashid"})
- * @ParamConverter("status", class="RoukmouteBundle\Entity\Notification", options={"id" = "statusHashid"})
+ * @Route("/users/{id}")
  */
-public function getAction(User $user, Status $status)
+public function getAction(int $user)
 {
 }
 ```
 
-Defining Hashid Automatically (Autowiring)
-==========================================
+For specific case, just add `"hashid" = "{parameter_name}"` in ParamConverter 
+options:
 
-Autowiring allows to guess hashid with minimal configuration.
-It automatically resolves the variable in route.
-The ParamConverter component will be able to automatically guess
-the hashid when configuration has autowire to true.
-
+```php
+/**
+ * @Route("/users/{slug}")
+ *
+ * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"hashid" = "user"})
+ */
+public function getAction(int $user)
+{
+}
 ```
+
+You could have several hashids one the same URL:
+
+```php
+/**
+ * @Route("/users/{user}/status/{status}")
+ *
+ * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"hashid" = "user"})
+ * @ParamConverter("status", class="RoukmouteBundle\Entity\Notification", options={"hashid" = "status"})
+ */
+public function getAction(int $user, int $status)
+{
+}
+```
+
+## Using Passthrough
+
+`Passthrough` allows to continue with the next available param converters.  
+So if you would like to retrieve an object instead of an integer, just active 
+passthrough :
+
+```yaml
 roukmoute_hashids:
-    autowire: true
+    passthrough: true
 ```
-
-The autowiring subsystem will detect the hashid.
 
 Base on the example above:
 
 ```php
 /**
  * @Route("/users/{hashid}")
- * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"id" = "hashid"})
  */
 public function getAction(User $user)
 {
 }
 ```
 
-Now you can do simply that:
+As you can see, the passthrough feature allows to use `DoctrineParamConverter` 
+or any another `ParamConverter` you would have created.
 
-```php
-/**
- * @Route("/users/{hashid}")
- */
-public function getAction(User $user)
-{
-}
-```
+## Twig Extension
+### Usage
 
-Or can directly use `id` now !
-
-```php
-/**
- * @Route("/users/{id}")
- */
-public function getAction(User $user)
-{
-}
-```
-
-As you can see, the autowiring feature reduces the amount of 
-configuration required to define a hashid.
-
-# Twig Extension
-## Usage
 ```twig
 {{ path('users.show', {'hashid': user.id | hashids_encode }) }}
 {{ app.request.query.get('hashid') | hashids_decode }}
 ```
-
-[1]: https://github.com/ivanakimov/hashids.php
-[2]: http://hashids.org/php/

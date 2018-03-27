@@ -1,16 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Roukmoute\HashidsBundle\ParamConverter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Roukmoute\HashidsBundle\Hashids;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class HashidsParamConverter extends DoctrineParamConverter implements ParamConverterInterface
+class HashidsParamConverter implements ParamConverterInterface
 {
     /**
      * @var Hashids
@@ -19,103 +18,78 @@ class HashidsParamConverter extends DoctrineParamConverter implements ParamConve
     /**
      * @var bool
      */
-    private $autowire;
+    private $passthrough;
 
-    public function __construct(Hashids $hashids, ManagerRegistry $registry, $autowire)
+    public function __construct(Hashids $hashids, bool $passthrough)
     {
-        parent::__construct($registry);
         $this->hashids = $hashids;
-        $this->autowire = $autowire;
+        $this->passthrough = $passthrough;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws  \LogicException  When unable to guess how to get a id from the request information
-     */
-    public function apply(Request $request, ParamConverter $configuration)
+    public function apply(Request $request, ParamConverter $configuration): bool
     {
-        $exception = null;
+        $this->setHashid($request, $configuration);
+        $this->removeHashidOption($configuration);
 
-        if ($this->autowire) {
-            try {
-                return parent::apply($request, $configuration);
-            } catch (\Exception $exception) {
-                $hashid = $this->hashIdentifier($request, $configuration);
-            }
-        } else {
-            $options = $configuration->getOptions();
-
-            if (!isset($options['id']) || mb_strtolower(mb_substr($options['id'], -6)) !== 'hashid') {
-                return false;
-            }
-
-            $hashid = $request->attributes->get($options['id']);
-        }
-
-        return $this->decodeHashid($request, $configuration, $hashid, $exception);
+        return $this->continueWithNextParamConverters();
     }
 
-    /**
-     * @param Request $request
-     * @param ParamConverter $configuration
-     * @param $hashid
-     * @param \Exception|null $exception
-     *
-     * @return bool
-     * @throws \Exception
-     */
-    private function decodeHashid(Request $request, ParamConverter $configuration, $hashid, \Exception $exception = null)
+    public function supports(ParamConverter $configuration): bool
     {
-        $options = $configuration->getOptions();
-        $decodeHashids = $this->hashids->decode($hashid);
-
-        if (!is_array($decodeHashids)
-            || !isset($decodeHashids[0])
-            || false === ($id = $decodeHashids[0])
-            || false === is_int($id)
-        ) {
-            if ($exception) {
-                throw $exception;
-            }
-            throw new \LogicException('Unable to guess hashid from the request information.');
-        }
-
-        $request->attributes->set('id', $id);
-        unset($options['id']);
-
-        $configuration->setOptions($options);
-        $configuration->setIsOptional(true);
-
-        parent::apply($request, $configuration);
-
-        $name = $configuration->getName();
-
-        if (!$request->attributes->get($name)) {
-            throw new NotFoundHttpException(sprintf('%s "%s" not found.', ucfirst($name), $hashid));
-        }
-
         return true;
     }
 
-    /**
-     * @param Request $request
-     * @param ParamConverter $configuration
-     *
-     * @return string
-     */
-    private function hashIdentifier(Request $request, ParamConverter $configuration)
+    private function setHashid(Request $request, ParamConverter $configuration): void
     {
-        $name = $configuration->getName();
-        $options = $this->getOptions($configuration);
+        $hashids = $this->hashids->decode(
+            $this->getIdentifier(
+                $request,
+                array_replace(['hashid' => null], $configuration->getOptions()),
+                $configuration->getName()
+            )
+        );
 
-        $hashid = $this->getIdentifier($request, $options, $name);
-
-        if (!$hashid && $request->attributes->has('hashid')) {
-            $hashid = $request->attributes->get('hashid');
+        if ($this->hasHashidDecoded($hashids)) {
+            $request->attributes->set($configuration->getName(), current($hashids));
         }
-
-        return $hashid;
     }
 
+    private function getIdentifier(Request $request, $options, string $name): string
+    {
+        if ($options['hashid'] && !is_array($options['hashid'])) {
+            $name = $options['hashid'];
+        }
+
+        if ($request->attributes->has($name)) {
+            return (string) $request->attributes->get($name);
+        }
+
+        foreach (['id', 'hashid'] as $item) {
+            if ($request->attributes->has($item) && !$options['hashid']) {
+                return (string) $request->attributes->get($item);
+            }
+        }
+
+        return '';
+    }
+
+    private function hasHashidDecoded($hashids): bool
+    {
+        return $hashids && is_iterable($hashids);
+    }
+
+    private function removeHashidOption(ParamConverter $configuration): void
+    {
+        $options = $configuration->getOptions();
+
+        if (isset($options['hashid'])) {
+            unset($options['hashid']);
+            $configuration->setOptions($options);
+        }
+    }
+
+    private function continueWithNextParamConverters(): bool
+    {
+        return !$this->passthrough;
+    }
 }

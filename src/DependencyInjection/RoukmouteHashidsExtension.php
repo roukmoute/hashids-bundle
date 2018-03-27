@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Roukmoute\HashidsBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -8,17 +11,16 @@ use Symfony\Component\DependencyInjection\Loader;
 
 class RoukmouteHashidsExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../../Resources/config'));
+        $loader = new Loader\XmlFileLoader($container, new FileLocator(dirname(__DIR__, 2) . '/Resources/config'));
         $loader->load('services.xml');
 
-        $container->setParameter('hashids.salt', $config['salt']);
-        $container->setParameter('hashids.min_hash_length', $config['min_hash_length']);
-        $container->setParameter('hashids.alphabet', $config['alphabet']);
-        $container->setParameter('hashids.autowire', $config['autowire']);
+        foreach (['salt', 'min_hash_length', 'alphabet', 'passthrough'] as $parameter) {
+            $container->setParameter('hashids.' . $parameter, $config[$parameter]);
+        }
     }
 }

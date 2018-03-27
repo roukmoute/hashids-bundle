@@ -1,12 +1,16 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Roukmoute\HashidsBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): NodeParentInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('roukmoute_hashids');
@@ -26,11 +30,12 @@ class Configuration implements ConfigurationInterface
                     ->info('if set, will use only characters of alphabet string.')
                     ->defaultValue('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
                 ->end()
-                ->booleanNode('autowire')
-                    ->info('if true, will try to detect the hashids when Doctrine was unable to guess Entity.')
+                ->booleanNode('passthrough')
+                    ->info('if true, will continue with others param converters.')
                     ->defaultFalse()
                 ->end()
-            ->end();
+            ->end()
+        ;
 
         return $treeBuilder;
     }

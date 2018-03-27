@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Roukmoute\HashidsBundle\Twig;
 
 use Roukmoute\HashidsBundle\Hashids;
@@ -16,7 +18,7 @@ class HashidsExtension extends \Twig_Extension
         $this->hashids = $hashids;
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new \Twig_SimpleFilter('hashids_encode', [$this, 'encode']),
@@ -24,14 +26,13 @@ class HashidsExtension extends \Twig_Extension
         ];
     }
 
-    public function encode($number)
+    public function encode($number): string
     {
         return $this->hashids->encode($number);
     }
 
-    public function decode($hash)
+    public function decode($hash): array
     {
         return $this->hashids->decode($hash);
     }
-
 }
