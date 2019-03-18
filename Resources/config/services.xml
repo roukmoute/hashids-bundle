@@ -12,7 +12,9 @@
             <argument>%hashids.min_hash_length%</argument>
             <argument>%hashids.alphabet%</argument>
         </service>
-
+        
+        <service id="Hashids\HashidsInterface" alias="hashids" public="false" />
+        
         <service id="hashids.converter"
                  class="Roukmoute\HashidsBundle\ParamConverter\HashidsParamConverter"
         >
