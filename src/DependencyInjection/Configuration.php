@@ -12,8 +12,8 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder(): NodeParentInterface
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('roukmoute_hashids');
+        $treeBuilder = new TreeBuilder('roukmoute_hashids');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
