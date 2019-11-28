@@ -30,7 +30,8 @@
     "bossa/phpspec2-expect": "^3.0",
     "phpspec/phpspec": "^4.3",
     "roave/security-advisories": "dev-master",
-    "twig/twig": "^2.4"
+    "twig/extensions": "^1.5",
+    "twig/twig": "^2.7"
   },
   "extra": {
     "branch-alias": {
