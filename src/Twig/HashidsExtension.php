@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Roukmoute\HashidsBundle\Twig;
 
 use Roukmoute\HashidsBundle\Hashids;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
-class HashidsExtension extends \Twig_Extension
+class HashidsExtension extends AbstractExtension
 {
     /**
      * @var Hashids
@@ -21,8 +23,8 @@ class HashidsExtension extends \Twig_Extension
     public function getFilters(): array
     {
         return [
-            new \Twig_SimpleFilter('hashids_encode', [$this, 'encode']),
-            new \Twig_SimpleFilter('hashids_decode', [$this, 'decode']),
+            new TwigFilter('hashids_encode', [$this, 'encode']),
+            new TwigFilter('hashids_decode', [$this, 'decode']),
         ];
     }
 
