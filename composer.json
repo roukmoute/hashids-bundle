@@ -28,7 +28,7 @@
   },
   "require-dev": {
     "bossa/phpspec2-expect": "^3.0",
-    "phpspec/phpspec": "^4.3",
+    "phpspec/phpspec": "^5.1",
     "roave/security-advisories": "dev-master",
     "twig/twig": "^2.7"
   },
