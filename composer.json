@@ -22,7 +22,7 @@
   },
   "require": {
     "php": ">=7.1",
-    "hashids/hashids": "^3.0",
+    "hashids/hashids": "^4.1",
     "sensio/framework-extra-bundle": "^5.1",
     "symfony/http-kernel": "^4.0 || ^5.0"
   },
