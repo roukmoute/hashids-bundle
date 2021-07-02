@@ -4,23 +4,20 @@ declare(strict_types=1);
 
 namespace Roukmoute\HashidsBundle\ParamConverter;
 
-use Roukmoute\HashidsBundle\Hashids;
+use Hashids\HashidsInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class HashidsParamConverter implements ParamConverterInterface
 {
-    /**
-     * @var Hashids
-     */
+    /** @var HashidsInterface */
     protected $hashids;
-    /**
-     * @var bool
-     */
+
+    /** @var bool */
     private $passthrough;
 
-    public function __construct(Hashids $hashids, bool $passthrough)
+    public function __construct(HashidsInterface $hashids, bool $passthrough)
     {
         $this->hashids = $hashids;
         $this->passthrough = $passthrough;
@@ -28,8 +25,8 @@ class HashidsParamConverter implements ParamConverterInterface
 
     public function apply(Request $request, ParamConverter $configuration): bool
     {
-        $this->setHashid($request, $configuration);
-        $this->removeHashidOption($configuration);
+        $this->decodeHashidOnRoute($request);
+        $this->decodeArgumentsController($request, $configuration);
 
         return $this->continueWithNextParamConverters();
     }
@@ -39,53 +36,33 @@ class HashidsParamConverter implements ParamConverterInterface
         return true;
     }
 
-    private function setHashid(Request $request, ParamConverter $configuration): void
+    private function decodeHashidOnRoute(Request $request)
     {
-        $hashids = $this->hashids->decode(
-            $this->getIdentifier(
-                $request,
-                array_replace(['hashid' => null], $configuration->getOptions()),
-                (string) $configuration->getName()
-            )
-        );
+        foreach (['hashid', 'id'] as $item) {
+            $hashids = $this->hashids->decode($request->attributes->get($item));
 
-        if ($this->hasHashidDecoded($hashids)) {
-            $request->attributes->set($configuration->getName(), current($hashids));
+            if ($this->hasHashidDecoded($hashids)) {
+                $hashid = current($hashids);
+                $request->attributes->remove($item);
+                $request->attributes->set('id', $hashid);
+            }
         }
     }
 
-    private function getIdentifier(Request $request, $options, string $name): string
+    private function decodeArgumentsController(Request $request, ParamConverter $configuration): void
     {
-        if ($options['hashid'] && !is_array($options['hashid'])) {
-            $name = $options['hashid'];
-        }
+        $name = $configuration->getName();
 
-        if ($request->attributes->has($name)) {
-            return (string) $request->attributes->get($name);
-        }
+        $hashids = $this->hashids->decode((string) $request->attributes->get($name));
 
-        foreach (['id', 'hashid'] as $item) {
-            if ($request->attributes->has($item) && !$options['hashid']) {
-                return (string) $request->attributes->get($item);
-            }
+        if ($this->hasHashidDecoded($hashids)) {
+            $request->attributes->set($name, current($hashids));
         }
-
-        return '';
     }
 
     private function hasHashidDecoded($hashids): bool
     {
-        return $hashids && is_iterable($hashids);
-    }
-
-    private function removeHashidOption(ParamConverter $configuration): void
-    {
-        $options = $configuration->getOptions();
-
-        if (isset($options['hashid'])) {
-            unset($options['hashid']);
-            $configuration->setOptions($options);
-        }
+        return $hashids && is_iterable($hashids) && is_int(reset($hashids));
     }
 
     private function continueWithNextParamConverters(): bool

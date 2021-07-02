@@ -1,0 +1,55 @@
+name: phpspec
+
+on:
+  push:
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    env:
+      extensions: intl, bcmath, curl, openssl, mbstring
+
+    strategy:
+      matrix:
+        include:
+          - php: '7.3'
+            mode: low-deps
+          - php: '7.3'
+          - php: '8.0'
+            mode: low-deps
+          - php: '8.0'
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: "none"
+          ini-values: date.timezone=Europe/Paris,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1
+          php-version: "${{ matrix.php }}"
+          extensions: "${{ env.extensions }}"
+          tools: flex
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: |
+          composer update --prefer-dist --no-progress $([ '${{ matrix.mode }}' = low-deps ] && echo '--prefer-lowest')
+
+      - name: Run phpspec tests
+        run: |
+          php vendor/bin/phpspec run

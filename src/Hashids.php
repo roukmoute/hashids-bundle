@@ -4,14 +4,45 @@ declare(strict_types=1);
 
 namespace Roukmoute\HashidsBundle;
 
-class Hashids extends \Hashids\Hashids
+use Hashids\HashidsInterface;
+use ReflectionObject;
+use ReflectionProperty;
+use RuntimeException;
+
+class Hashids implements HashidsInterface
 {
-    /**
-     * Sets the minimum hash length.
-     */
-    public function setMinHashLength(int $minHashLength): void
+    /** @var HashidsInterface */
+    private $hashids;
+
+    /** The minimum hash length. */
+    private $minHashLength;
+
+    /** @var ReflectionProperty */
+    private $minHashLengthReflection;
+
+    public function __construct(HashidsInterface $hashids)
     {
-        $this->minHashLength = $minHashLength;
+        $this->hashids = $hashids;
+    }
+
+    public function encode(...$numbers)
+    {
+        return $this->hashids->encode($numbers);
+    }
+
+    public function decode($hash)
+    {
+        return $this->hashids->decode($hash);
+    }
+
+    public function encodeHex($str)
+    {
+        return $this->hashids->encodeHex($str);
+    }
+
+    public function decodeHex($hash)
+    {
+        return $this->hashids->decodeHex($hash);
     }
 
     /**
@@ -21,12 +52,13 @@ class Hashids extends \Hashids\Hashids
      */
     public function encodeWithCustomHashLength(int $minHashLength, int ...$numbers): string
     {
-        $originalHashLength = $this->minHashLength;
         $this->setMinHashLength($minHashLength);
-        $hashids = $this->encode($numbers);
-        $this->restoreMinHashLength($originalHashLength);
 
-        return $hashids;
+        $hashid = $this->hashids->encode($numbers);
+
+        $this->restoreMinHashLength();
+
+        return $hashid;
     }
 
     /**
@@ -34,16 +66,31 @@ class Hashids extends \Hashids\Hashids
      */
     public function decodeWithCustomHashLength(int $minHashLength, string $hash): array
     {
-        $originalHashLength = $this->minHashLength;
         $this->setMinHashLength($minHashLength);
-        $hashids = $this->decode($hash);
-        $this->restoreMinHashLength($originalHashLength);
 
-        return $hashids;
+        $decodesHashids = $this->hashids->decode($hash);
+
+        $this->restoreMinHashLength();
+
+        return $decodesHashids;
     }
 
-    protected function restoreMinHashLength(int $originalMinHashLength): void
+    public function setMinHashLength(int $minHashLength): void
     {
-        $this->minHashLength = $originalMinHashLength;
+        $hashIdsReflection = new ReflectionObject($this->hashids);
+        if (!$hashIdsReflection->hasProperty('minHashLength')) {
+            throw new RuntimeException(sprintf('Missing "minHashLength" property in class "%s"', get_class($this->hashids)));
+        }
+
+        $this->minHashLengthReflection = new ReflectionProperty(get_class($this->hashids), 'minHashLength');
+        $this->minHashLengthReflection->setAccessible(true);
+        $this->minHashLength = $this->minHashLengthReflection->getValue($this->hashids);
+        $this->minHashLengthReflection->setValue($this->hashids, $minHashLength);
+    }
+
+    private function restoreMinHashLength(): void
+    {
+        $this->minHashLengthReflection->setValue($this->hashids, $this->minHashLength);
+        $this->minHashLengthReflection->setAccessible(false);
     }
 }

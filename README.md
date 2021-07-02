@@ -1,4 +1,4 @@
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/e79d4122-c9ad-454f-a1ac-981dd683144f/mini.png)](https://insight.sensiolabs.com/projects/e79d4122-c9ad-454f-a1ac-981dd683144f) [![Scrutinizer](https://scrutinizer-ci.com/g/roukmoute/HashidsBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/roukmoute/HashidsBundle/)
+[![SensioLabsInsight](https://insight.symfony.com/projects/815f344f-3f92-4d44-963b-c0d34599f0ce/mini.svg)](https://insight.symfony.com/account/widget?project=815f344f-3f92-4d44-963b-c0d34599f0ce) [![Scrutinizer](https://scrutinizer-ci.com/g/roukmoute/HashidsBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/roukmoute/HashidsBundle/)
 
 # HashidsBundle
 
@@ -17,7 +17,7 @@ commands to download the latest stable version of this bundle:
     composer req roukmoute/hashids-bundle
 ```
 
-### Using Symfony 4 Framework
+### Using Symfony Framework only
 
 ```
     composer require roukmoute/hashids-bundle
@@ -59,7 +59,13 @@ roukmoute_hashids:
 ## Usage
 
 ```php
-$hashids = $this->get('hashids');
+
+use Hashids\HashidsInterface;
+
+public function postShow(HashidsInterface $hashids): Response
+{
+    $hashids->…
+}
 ```
 
 Next it's the same things of [official documentation](http://hashids.org/php/).
@@ -72,17 +78,17 @@ The `Roukmoute\HashidsBundle\Hashids` has extra features:
 $minHashLength = 42;
 
 // Edit the minimum hash length.
-$this->get('hashids')->setMinHashLength($minHashLength)->encode(1, 2, 3);
+$hashids->setMinHashLength($minHashLength)->encode(1, 2, 3);
 
 // Encode with a custom minimum hash length.
-$this->get('hashids')->encodeWithCustomHashLength($minHashLength, 1, 2, 3);
+$hashids->encodeWithCustomHashLength($minHashLength, 1, 2, 3);
 ```
 
 ## Hashids Converter
 
 Converter Name: `hashids.converter`
 
-The hashids converter attempts to convert `hashid`/`id` attribute set in the route into an integer parameter.
+The hashids converter attempts to convert any attribute set in the route into an integer parameter.
 
 You could use `hashid` or `id` to add :
 
@@ -106,28 +112,11 @@ public function getAction(int $user)
 }
 ```
 
-For specific case, just add `"hashid" = "{parameter_name}"` in ParamConverter 
-options:
-
-```php
-/**
- * @Route("/users/{slug}")
- *
- * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"hashid" = "user"})
- */
-public function getAction(int $user)
-{
-}
-```
-
 You could have several hashids one the same URL:
 
 ```php
 /**
  * @Route("/users/{user}/status/{status}")
- *
- * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"hashid" = "user"})
- * @ParamConverter("status", class="RoukmouteBundle\Entity\Notification", options={"hashid" = "status"})
  */
 public function getAction(int $user, int $status)
 {

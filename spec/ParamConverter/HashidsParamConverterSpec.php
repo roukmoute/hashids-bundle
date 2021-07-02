@@ -17,7 +17,7 @@ class HashidsParamConverterSpec extends ObjectBehavior
 {
     public function let()
     {
-        $this->beConstructedWith(new Hashids(), false);
+        $this->beConstructedWith(new Hashids(new \Hashids\Hashids()), false);
     }
 
     public function it_is_initializable(Hashids $hashids)
@@ -34,7 +34,7 @@ class HashidsParamConverterSpec extends ObjectBehavior
         $configuration->setName('controllerArgument');
 
         $this->apply($request, $configuration)->shouldReturn(true);
-        expect($request->attributes->get('controllerArgument'))->toBe(42);
+        expect($request->attributes->get('id'))->toBe(42);
     }
 
     public function it_hashes_when_id_is_in_request()
@@ -44,17 +44,7 @@ class HashidsParamConverterSpec extends ObjectBehavior
         $configuration->setName('controllerArgument');
 
         $this->apply($request, $configuration)->shouldReturn(true);
-        expect($request->attributes->get('controllerArgument'))->toBe(42);
-    }
-
-    public function it_hashes_when_hashid_is_in_ParamConverter_options()
-    {
-        $request = new Request([], [], ['slug' => '9x']);
-        $configuration = new ParamConverter(['options' => ['hashid' => 'slug']]);
-        $configuration->setName('controllerArgument');
-
-        $this->apply($request, $configuration)->shouldReturn(true);
-        expect($request->attributes->get('controllerArgument'))->toBe(42);
+        expect($request->attributes->get('id'))->toBe(42);
     }
 
     public function it_does_not_hash_when_there_is_no_hashid()

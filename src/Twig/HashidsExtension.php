@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Roukmoute\HashidsBundle\Twig;
 
+use Hashids\HashidsInterface;
 use Roukmoute\HashidsBundle\Hashids;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -15,7 +16,7 @@ class HashidsExtension extends AbstractExtension
      */
     private $hashids;
 
-    public function __construct(Hashids $hashids)
+    public function __construct(HashidsInterface $hashids)
     {
         $this->hashids = $hashids;
     }

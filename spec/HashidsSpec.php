@@ -10,6 +10,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class HashidsSpec extends ObjectBehavior
 {
+    public function let()
+    {
+        $this->beConstructedWith(new \Hashids\Hashids());
+    }
+
     public function it_is_initializable()
     {
         $this->shouldHaveType(Hashids::class);
@@ -27,6 +32,7 @@ class HashidsSpec extends ObjectBehavior
     public function it_encodes_with_custom_hash_length()
     {
         expect($this->encode(1)->getWrappedObject())->toBe('jR');
+        expect((new \Hashids\Hashids('', 4))->encode(1))->toBe('ejRe');
         expect($this->encodeWithCustomHashLength(4, 1)->getWrappedObject())->toBe('ejRe');
         expect($this->encode(1)->getWrappedObject())->toBe('jR');
     }
@@ -38,11 +44,11 @@ class HashidsSpec extends ObjectBehavior
         expect($this->decode('jR')->getWrappedObject())->toBe([1]);
     }
 
-    public function it_has_public_visibility_for_hashid_service()
-    {
-        $container = new ContainerBuilder(new ParameterBag([]));
-        (new RoukmouteHashidsExtension())->load([[]], $container);
-
-        expect($container->getDefinition('hashids')->isPublic())->toBe(true);
-    }
+//    public function it_has_public_visibility_for_hashid_service()
+//    {
+//        $container = new ContainerBuilder(new ParameterBag([]));
+//        (new RoukmouteHashidsExtension())->load([[]], $container);
+//
+//        expect($container->getDefinition('hashids')->isPublic())->toBe(true);
+//    }
 }

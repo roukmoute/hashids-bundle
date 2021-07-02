@@ -19,7 +19,7 @@ class HashidsExtensionSpec extends ObjectBehavior
 
     public function it_encodes_in_twig_file()
     {
-        $extension = new HashidsExtension(new Hashids());
+        $extension = new HashidsExtension(new Hashids(new \Hashids\Hashids()));
         $twig = new Environment(
             new ArrayLoader(['template' => "{{ 1|hashids_encode }}"]),
             ['cache' => false, 'optimizations' => 0]
@@ -31,7 +31,7 @@ class HashidsExtensionSpec extends ObjectBehavior
 
     public function it_decodes_in_twig_file()
     {
-        $extension = new HashidsExtension(new Hashids());
+        $extension = new HashidsExtension(new Hashids(new \Hashids\Hashids()));
         $twig = new Environment(
             new ArrayLoader(['template' => "{{ 'jR'|hashids_decode|first }}"]),
             ['cache' => false, 'optimizations' => 0]
