@@ -25,8 +25,11 @@ class HashidsParamConverter implements ParamConverterInterface
 
     public function apply(Request $request, ParamConverter $configuration): bool
     {
-        $this->decodeHashidOnRoute($request);
-        $this->decodeArgumentsController($request, $configuration);
+        $decodedSuccessfuly = $this->decodeHashidOnRoute($request);
+
+        if($decodedSuccessfuly === false) {
+            $this->decodeArgumentsController($request, $configuration);
+        }
 
         return $this->continueWithNextParamConverters();
     }
@@ -36,17 +39,20 @@ class HashidsParamConverter implements ParamConverterInterface
         return true;
     }
 
-    private function decodeHashidOnRoute(Request $request)
+    private function decodeHashidOnRoute(Request $request): bool
     {
         foreach (['hashid', 'id'] as $item) {
             $hashids = $this->hashids->decode($request->attributes->get($item));
-
             if ($this->hasHashidDecoded($hashids)) {
                 $hashid = current($hashids);
+
                 $request->attributes->remove($item);
                 $request->attributes->set('id', $hashid);
+                return true;
             }
         }
+
+        return false;
     }
 
     private function decodeArgumentsController(Request $request, ParamConverter $configuration): void
