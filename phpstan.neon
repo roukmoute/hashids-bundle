@@ -1,0 +1,9 @@
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+
+parameters:
+	level: max
+	paths:
+		- src
+	parallel:
+		maximumNumberOfProcesses: 1

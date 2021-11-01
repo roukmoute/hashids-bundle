@@ -1,0 +1,43 @@
+name: Static analysis
+
+on:
+  pull_request:
+  push:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  static_analysis:
+    name: Static analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: none
+          ini-values: "memory_limit=-1"
+          php-version: "8.0"
+
+      - name: Install dependencies
+        run: |
+          composer update --prefer-dist --no-progress
+
+      - name: Run php-cs-fixer
+        run: |
+          php vendor/bin/php-cs-fixer fix --diff --dry-run -v
+
+      - name: Run phpstan
+        run: |
+          php vendor/bin/phpstan
+
+      - name: Run phpmd
+        run: |
+          php vendor/bin/phpmd src xml pmd-ruleset.xml
