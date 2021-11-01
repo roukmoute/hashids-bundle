@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace spec\Roukmoute\HashidsBundle\Twig;
 
-use Roukmoute\HashidsBundle\Hashids;
-use Roukmoute\HashidsBundle\Twig\HashidsExtension;
+use Hashids\HashidsInterface;
 use PhpSpec\ObjectBehavior;
+use Roukmoute\HashidsBundle\Twig\HashidsExtension;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
 class HashidsExtensionSpec extends ObjectBehavior
 {
-    public function it_is_initializable(Hashids $hashids)
+    public function it_is_initializable(HashidsInterface $hashids)
     {
         $this->beConstructedWith($hashids);
 
@@ -19,9 +21,9 @@ class HashidsExtensionSpec extends ObjectBehavior
 
     public function it_encodes_in_twig_file()
     {
-        $extension = new HashidsExtension(new Hashids());
+        $extension = new HashidsExtension(new \Hashids\Hashids());
         $twig = new Environment(
-            new ArrayLoader(['template' => "{{ 1|hashids_encode }}"]),
+            new ArrayLoader(['template' => '{{ 1|hashids_encode }}']),
             ['cache' => false, 'optimizations' => 0]
         );
         $twig->addExtension($extension);
@@ -31,9 +33,9 @@ class HashidsExtensionSpec extends ObjectBehavior
 
     public function it_decodes_in_twig_file()
     {
-        $extension = new HashidsExtension(new Hashids());
+        $extension = new HashidsExtension(new \Hashids\Hashids());
         $twig = new Environment(
-            new ArrayLoader(['template' => "{{ 'jR'|hashids_decode|first }}"]),
+            new ArrayLoader(['template' => '{{ \'jR\'|hashids_decode|first }}']),
             ['cache' => false, 'optimizations' => 0]
         );
         $twig->addExtension($extension);

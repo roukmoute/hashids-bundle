@@ -34,6 +34,10 @@ class Configuration implements ConfigurationInterface
                     ->info('if true, will continue with others param converters.')
                     ->defaultFalse()
                 ->end()
+                ->booleanNode('auto_convert')
+                    ->info('if true, try to convert all arguments in controller. Except use "_hash_" in specific routing variables.')
+                    ->defaultFalse()
+                ->end()
             ->end()
         ;
 

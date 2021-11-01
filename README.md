@@ -1,4 +1,6 @@
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/e79d4122-c9ad-454f-a1ac-981dd683144f/mini.png)](https://insight.sensiolabs.com/projects/e79d4122-c9ad-454f-a1ac-981dd683144f) [![Scrutinizer](https://scrutinizer-ci.com/g/roukmoute/HashidsBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/roukmoute/HashidsBundle/)
+[![SymfonyInsight](https://insight.symfony.com/projects/be961d5c-da56-44b1-a094-e27066802a2d/mini.svg)](https://insight.symfony.com/projects/be961d5c-da56-44b1-a094-e27066802a2d)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/roukmoute/hashids-bundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/roukmoute/hashids-bundle/?branch=master)
+![Packagist Downloads](https://img.shields.io/packagist/dt/roukmoute/hashids-bundle)
 
 # HashidsBundle
 
@@ -17,7 +19,7 @@ commands to download the latest stable version of this bundle:
     composer req roukmoute/hashids-bundle
 ```
 
-### Using Symfony 4 Framework
+### Using Symfony Framework only
 
 ```
     composer require roukmoute/hashids-bundle
@@ -54,37 +56,33 @@ roukmoute_hashids:
 
     # if set to true, it will continue with the next available param converters
     passthrough:     false
+
+    # if set to true, it tries to convert all arguments passed to the controller
+    auto_convert:    false
 ```
 
 ## Usage
 
 ```php
-$hashids = $this->get('hashids');
+
+use Hashids\HashidsInterface;
+
+public function postShow(HashidsInterface $hashids): Response
+{
+    $hashids->…
+}
 ```
 
-Next it's the same things of [official documentation](http://hashids.org/php/).
-
-## Other Features
-
-The `Roukmoute\HashidsBundle\Hashids` has extra features:
-
-```php
-$minHashLength = 42;
-
-// Edit the minimum hash length.
-$this->get('hashids')->setMinHashLength($minHashLength)->encode(1, 2, 3);
-
-// Encode with a custom minimum hash length.
-$this->get('hashids')->encodeWithCustomHashLength($minHashLength, 1, 2, 3);
-```
+Next it's the same things of [official documentation](https://hashids.org/php/).
 
 ## Hashids Converter
 
 Converter Name: `hashids.converter`
 
-The hashids converter attempts to convert `hashid`/`id` attribute set in the route into an integer parameter.
+The hashids converter attempts to convert any attribute set in the route into 
+an integer parameter.
 
-You could use `hashid` or `id` to add :
+You could use `hashid` or `id`:
 
 ```php
 /**
@@ -106,37 +104,55 @@ public function getAction(int $user)
 }
 ```
 
-For specific case, just add `"hashid" = "{parameter_name}"` in ParamConverter 
-options:
+You could have several hashids in the same URL prefixed with  `_hash_`.
 
 ```php
 /**
- * @Route("/users/{slug}")
- *
- * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"hashid" = "user"})
- */
-public function getAction(int $user)
-{
-}
-```
-
-You could have several hashids one the same URL:
-
-```php
-/**
- * @Route("/users/{user}/status/{status}")
- *
- * @ParamConverter("user", class="RoukmouteBundle\Entity\User", options={"hashid" = "user"})
- * @ParamConverter("status", class="RoukmouteBundle\Entity\Notification", options={"hashid" = "status"})
+ * @Route("/users/{_hash_user}/status/{_hash_status}")
  */
 public function getAction(int $user, int $status)
 {
 }
 ```
 
-## Using Passthrough
+The keys must be the same as in parameters controller:
 
-`Passthrough` allows to continue with the next available param converters.  
+```php
+/**
+ *                          _hash_user _hash_status
+ *                                 ↕            ↕
+ * public function getAction(int $user, int $status)
+ */
+```
+
+You will receive a `LogicException` if a hash could not be decoded correctly.
+
+## Using auto_convert
+
+`auto_convert` tries to convert all arguments in controller.
+
+```yaml
+roukmoute_hashids:
+  auto_convert: true
+```
+
+Base on the example above:
+
+```php
+/**
+ * @Route("/users/{user}/status/{status}")
+ */
+public function getAction(int $user, int $status)
+{
+}
+```
+
+It will not be possible to get an exception of type `LogicException` from the 
+bundle if it is activated.
+
+## Using passthrough
+
+`passthrough` allows to continue with the next available param converters.  
 So if you would like to retrieve an object instead of an integer, just active 
 passthrough :
 
@@ -157,7 +173,7 @@ public function getAction(User $user)
 ```
 
 As you can see, the passthrough feature allows to use `DoctrineParamConverter` 
-or any another `ParamConverter` you would have created.
+or any another `ParamConverterInterface` you would have created.
 
 ## Twig Extension
 ### Usage

@@ -4,18 +4,15 @@ declare(strict_types=1);
 
 namespace Roukmoute\HashidsBundle\Twig;
 
-use Roukmoute\HashidsBundle\Hashids;
+use Hashids\HashidsInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 class HashidsExtension extends AbstractExtension
 {
-    /**
-     * @var Hashids
-     */
-    private $hashids;
+    private HashidsInterface $hashids;
 
-    public function __construct(Hashids $hashids)
+    public function __construct(HashidsInterface $hashids)
     {
         $this->hashids = $hashids;
     }
@@ -28,12 +25,15 @@ class HashidsExtension extends AbstractExtension
         ];
     }
 
-    public function encode($number): string
+    public function encode(int $number): string
     {
         return $this->hashids->encode($number);
     }
 
-    public function decode($hash): array
+    /**
+     * @return array<int, ?int>
+     */
+    public function decode(string $hash): array
     {
         return $this->hashids->decode($hash);
     }
