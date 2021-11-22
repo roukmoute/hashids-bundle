@@ -27,7 +27,7 @@ class HashidsParamConverter implements ParamConverterInterface
 
     public function apply(Request $request, ParamConverter $configuration): bool
     {
-        $this->decodeArgumentsController($request, $configuration);
+        $this->decode($request, $configuration);
 
         return $this->continueWithNextParamConverters();
     }
@@ -37,7 +37,7 @@ class HashidsParamConverter implements ParamConverterInterface
         return true;
     }
 
-    private function decodeArgumentsController(Request $request, ParamConverter $configuration): void
+    private function decode(Request $request, ParamConverter $configuration): void
     {
         $hash = $this->getHash($request, $configuration);
 
