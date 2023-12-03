@@ -52,7 +52,7 @@ class HashidsParamConverter implements ParamConverterInterface
             $request->attributes->set($name, current($hashids));
         }
 
-        if (!$this->autoConvert && !$this->hasHashidDecoded($hashids)) {
+        if ($this->autoConvert && !$this->hasHashidDecoded($hashids)) {
             throw new LogicException(sprintf('Unable to decode parameter "%s".', $name));
         }
     }
