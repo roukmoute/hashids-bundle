@@ -25,7 +25,7 @@
     "hashids/hashids": "^4.1",
     "sensio/framework-extra-bundle": "^5.1 || ^6.0",
     "symfony/http-kernel": "^4.4 || ^5.3 || ^6.0",
-    "symfony/http-foundation": "^4.4 || ^5.3 || ^6.0"
+    "symfony/http-foundation": "^7.1.1"
   },
   "require-dev": {
     "friends-of-phpspec/phpspec-expect": "^4.0",
