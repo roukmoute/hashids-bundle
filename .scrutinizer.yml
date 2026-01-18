@@ -1,0 +1,13 @@
+build:
+    environment:
+        php: 8.4
+
+checks:
+    php: true
+
+tools:
+    external_code_coverage: false
+
+filter:
+    paths:
+        - src/
