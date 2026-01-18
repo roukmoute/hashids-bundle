@@ -37,11 +37,7 @@ jobs:
           - php: '8.3'
             symfony: '^7.0'
 
-          # PHP 8.3 with Symfony 8.x
-          - php: '8.3'
-            symfony: '^8.0'
-
-          # Note: PHP 8.4 not tested yet due to phpspec compatibility issues with Symfony Console
+          # Note: PHP 8.4 and Symfony 8 not tested yet due to phpspec compatibility issues with Symfony Console
       fail-fast: false
 
     steps:
