@@ -8,4 +8,7 @@ parameters:
 	parallel:
 		maximumNumberOfProcesses: 1
 	ignoreErrors:
-		- '#Call to method \w+\(\) on an unknown class Symfony\\Component\\Config\\Definition\\Builder\\NodeBuilder#'
+		-
+			identifier: method.notFound
+			message: '#Call to method \w+\(\) on an unknown class Symfony\\Component\\Config\\Definition\\Builder\\NodeBuilder#'
+			reportUnmatched: false
