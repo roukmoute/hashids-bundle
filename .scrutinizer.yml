@@ -1,6 +1,6 @@
 build:
     environment:
-        php: 8.4
+        php: 8.2
 
 checks:
     php: true
