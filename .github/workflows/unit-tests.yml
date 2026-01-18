@@ -10,23 +10,39 @@ defaults:
 
 jobs:
   tests:
-    name: Unit tests
+    name: PHP ${{ matrix.php }} - Symfony ${{ matrix.symfony }}${{ matrix.mode == 'low-deps' && ' (lowest)' || '' }}
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         include:
-          - php: '7.4'
+          # PHP 8.1 with Symfony 6.2
+          - php: '8.1'
+            symfony: '6.2.*'
             mode: low-deps
-          - php: '7.4'
-          - php: '8.0'
-            mode: low-deps
-          - php: '8.0'
+          - php: '8.1'
+            symfony: '6.2.*'
+
+          # PHP 8.2 with Symfony 6.4 LTS
+          - php: '8.2'
+            symfony: '6.4.*'
+
+          # PHP 8.2 with Symfony 7.0
+          - php: '8.2'
+            symfony: '7.0.*'
+
+          # PHP 8.3 with Symfony 7.2
+          - php: '8.3'
+            symfony: '7.2.*'
+
+          # PHP 8.4 with Symfony 8.0
+          - php: '8.4'
+            symfony: '8.0.*'
       fail-fast: false
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
@@ -40,9 +56,13 @@ jobs:
       - name: Validate composer.json and composer.lock
         run: composer validate --strict --no-check-lock
 
+      - name: Configure Symfony version
+        run: |
+          composer require --no-update symfony/http-kernel:${{ matrix.symfony }} symfony/http-foundation:${{ matrix.symfony }}
+
       - name: Install dependencies
         run: |
-          composer update --prefer-dist --no-progress $([ '${{ matrix.mode }}' = low-deps ] && echo '--prefer-lowest')
+          composer update --prefer-dist --no-progress ${{ matrix.mode == 'low-deps' && '--prefer-lowest' || '' }}
 
       - name: Run phpspec
         run: |
