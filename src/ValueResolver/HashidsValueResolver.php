@@ -57,11 +57,7 @@ class HashidsValueResolver implements ValueResolverInterface
 
     private function hasHashidAttribute(ArgumentMetadata $argument): bool
     {
-        foreach ($argument->getAttributes(Hashid::class, ArgumentMetadata::IS_INSTANCEOF) as $attribute) {
-            return true;
-        }
-
-        return false;
+        return $argument->getAttributes(Hashid::class, ArgumentMetadata::IS_INSTANCEOF) !== [];
     }
 
     /**

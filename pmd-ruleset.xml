@@ -8,7 +8,9 @@
         HashidsBundle PHPMD rule set.
     </description>
 
-    <rule ref="rulesets/cleancode.xml" />
+    <rule ref="rulesets/cleancode.xml">
+        <exclude name="MissingImport" />
+    </rule>
 
     <rule ref="rulesets/codesize.xml"/>
 
