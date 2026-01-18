@@ -19,9 +19,10 @@ class HashidsExtensionSpec extends ObjectBehavior
         $this->shouldHaveType(HashidsExtension::class);
     }
 
-    public function it_encodes_in_twig_file()
+    public function it_encodes_in_twig_file(HashidsInterface $hashids)
     {
-        $extension = new HashidsExtension(new \Hashids\Hashids());
+        $hashids->encode(1)->willReturn('jR');
+        $extension = new HashidsExtension($hashids->getWrappedObject());
         $twig = new Environment(
             new ArrayLoader(['template' => '{{ 1|hashids_encode }}']),
             ['cache' => false, 'optimizations' => 0]
@@ -31,9 +32,10 @@ class HashidsExtensionSpec extends ObjectBehavior
         expect($twig->render('template'))->toBe('jR');
     }
 
-    public function it_decodes_in_twig_file()
+    public function it_decodes_in_twig_file(HashidsInterface $hashids)
     {
-        $extension = new HashidsExtension(new \Hashids\Hashids());
+        $hashids->decode('jR')->willReturn([1]);
+        $extension = new HashidsExtension($hashids->getWrappedObject());
         $twig = new Environment(
             new ArrayLoader(['template' => '{{ \'jR\'|hashids_decode|first }}']),
             ['cache' => false, 'optimizations' => 0]

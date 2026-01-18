@@ -4,6 +4,11 @@
 
 # HashidsBundle
 
+> **Note:** This bundle is maintained, but for **new projects**, consider using [roukmoute/sqids-bundle](https://github.com/roukmoute/sqids-bundle) instead.
+> [Sqids](https://sqids.org/) is the official successor to Hashids, featuring a simpler algorithm, consistent cross-language output, and a built-in profanity blocklist.
+> However, Sqids is **not a drop-in replacement** — it produces different IDs. Only migrate if you don't rely on previously generated Hashids.
+> See the [official Hashids recommendation](https://github.com/hashids/.github/blob/main/profile/README.md) for more details.
+
 Integrates [hashids/hashids](https://github.com/ivanakimov/hashids.php) in a Symfony project.
 
 ## Installation using composer
@@ -54,7 +59,7 @@ roukmoute_hashids:
     # if set, will use only characters of alphabet string
     alphabet:        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 
-    # if set to true, it will continue with the next available param converters
+    # if set to true, it will continue with the next available value resolvers
     passthrough:     false
 
     # if set to true, it tries to convert all arguments passed to the controller
@@ -75,20 +80,33 @@ public function postShow(HashidsInterface $hashids): Response
 
 Next it's the same things of [official documentation](https://hashids.org/php/).
 
-## Hashids Converter
+## Hashids Value Resolver
 
-Converter Name: `hashids.converter`
-
-The hashids converter attempts to convert any attribute set in the route into 
+The hashids value resolver attempts to convert any attribute set in the route into
 an integer parameter.
 
-You could use `hashid` or `id`:
+### Using the `#[Hashid]` attribute
+
+The recommended way is to use the `#[Hashid]` attribute on your controller parameter:
 
 ```php
-/**
- * @Route("/users/{hashid}")
- */
-public function getAction(int $user)
+use Roukmoute\HashidsBundle\Attribute\Hashid;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[Route('/posts/{id}')]
+public function show(#[Hashid] int $id): Response
+{
+    // $id is automatically decoded from the hashid
+}
+```
+
+### Using route aliases
+
+You can also use `hashid` or `id` as route parameter names:
+
+```php
+#[Route('/users/{hashid}')]
+public function getAction(int $user): Response
 {
 }
 ```
@@ -96,36 +114,32 @@ public function getAction(int $user)
 or
 
 ```php
-/**
- * @Route("/users/{id}")
- */
-public function getAction(int $user)
+#[Route('/users/{id}')]
+public function getAction(int $user): Response
 {
 }
 ```
 
-You could have several hashids in the same URL prefixed with  `_hash_`.
+### Using the `_hash_` prefix
+
+You can have several hashids in the same URL using the `_hash_` prefix:
 
 ```php
-/**
- * @Route("/users/{_hash_user}/status/{_hash_status}")
- */
+#[Route('/users/{_hash_user}/status/{_hash_status}')]
+public function getAction(int $user, int $status): Response
+{
+}
+```
+
+The keys must match the controller parameter names:
+
+```php
+//                          _hash_user  _hash_status
+//                                 ↕            ↕
 public function getAction(int $user, int $status)
-{
-}
 ```
 
-The keys must be the same as in parameters controller:
-
-```php
-/**
- *                          _hash_user _hash_status
- *                                 ↕            ↕
- * public function getAction(int $user, int $status)
- */
-```
-
-You will receive a `LogicException` if a hash could not be decoded correctly.
+You will receive a `LogicException` if an explicit hash could not be decoded correctly.
 
 ## Using auto_convert
 
@@ -136,44 +150,40 @@ roukmoute_hashids:
   auto_convert: true
 ```
 
-Base on the example above:
+Based on the example above:
 
 ```php
-/**
- * @Route("/users/{user}/status/{status}")
- */
-public function getAction(int $user, int $status)
+#[Route('/users/{user}/status/{status}')]
+public function getAction(int $user, int $status): Response
 {
 }
 ```
 
-It will not be possible to get an exception of type `LogicException` from the 
+It will not be possible to get an exception of type `LogicException` from the
 bundle if it is activated.
 
 ## Using passthrough
 
-`passthrough` allows to continue with the next available param converters.  
-So if you would like to retrieve an object instead of an integer, just active 
-passthrough :
+`passthrough` allows to continue with the next available value resolvers.
+So if you would like to retrieve an object instead of an integer, just activate
+passthrough:
 
 ```yaml
 roukmoute_hashids:
     passthrough: true
 ```
 
-Base on the example above:
+Based on the example above:
 
 ```php
-/**
- * @Route("/users/{hashid}")
- */
-public function getAction(User $user)
+#[Route('/users/{hashid}')]
+public function getAction(User $user): Response
 {
 }
 ```
 
-As you can see, the passthrough feature allows to use `DoctrineParamConverter` 
-or any another `ParamConverterInterface` you would have created.
+As you can see, the passthrough feature allows to use `EntityValueResolver`
+or any other `ValueResolverInterface` you would have created.
 
 ## Twig Extension
 ### Usage
