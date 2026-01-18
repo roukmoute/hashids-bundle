@@ -37,9 +37,9 @@ jobs:
           - php: '8.3'
             symfony: '^7.0'
 
-          # PHP 8.4 with Symfony 7.x
-          - php: '8.4'
-            symfony: '^7.0'
+          # PHP 8.3 with latest Symfony 7.x
+          - php: '8.3'
+            symfony: '^7.4'
       fail-fast: false
 
     steps:
