@@ -161,4 +161,29 @@ class HashidsValueResolverSpec extends ObjectBehavior
 
         $this->shouldThrow(new \LogicException('Unable to decode parameter "post".'))->during('resolve', [$request, $argument]);
     }
+
+    public function it_uses_custom_parameter_name_from_hashid_attribute(HashidsInterface $hashids): void
+    {
+        $hashids->decode('9x')->willReturn([42]);
+        $this->beConstructedWith($hashids, false, false, self::ALPHABET);
+
+        $request = new Request([], [], ['hash' => '9x']);
+        $argument = new ArgumentMetadata('id', 'int', false, false, null, false, [new Hashid(parameter: 'hash')]);
+
+        $result = $this->resolve($request, $argument);
+        expect([...$result->getWrappedObject()])->toBe([42]);
+    }
+
+    public function it_uses_custom_parameter_name_with_passthrough(HashidsInterface $hashids): void
+    {
+        $hashids->decode('9x')->willReturn([42]);
+        $this->beConstructedWith($hashids, true, false, self::ALPHABET);
+
+        $request = new Request([], [], ['hash' => '9x']);
+        $argument = new ArgumentMetadata('id', 'int', false, false, null, false, [new Hashid(parameter: 'hash')]);
+
+        $result = $this->resolve($request, $argument);
+        expect([...$result->getWrappedObject()])->toBe([]);
+        expect($request->attributes->get('id'))->toBe(42);
+    }
 }

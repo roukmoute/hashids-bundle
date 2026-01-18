@@ -100,6 +100,16 @@ public function show(#[Hashid] int $id): Response
 }
 ```
 
+You can also specify a different route parameter name using the `parameter` option:
+
+```php
+#[Route('/posts/{hash}')]
+public function show(#[Hashid(parameter: 'hash')] int $id): Response
+{
+    // The 'hash' route parameter is decoded into $id
+}
+```
+
 ### Using route aliases
 
 You can also use `hashid` or `id` as route parameter names:

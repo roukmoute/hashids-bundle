@@ -26,8 +26,9 @@ class HashidsValueResolver implements ValueResolverInterface
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         $name = $argument->getName();
-        $hasHashidAttribute = $this->hasHashidAttribute($argument);
-        [$hash, $isExplicit] = $this->getHash($request, $name, $hasHashidAttribute);
+        $hashidAttribute = $this->getHashidAttribute($argument);
+        $routeParameter = $hashidAttribute?->parameter ?? $name;
+        [$hash, $isExplicit] = $this->getHash($request, $routeParameter, $hashidAttribute !== null);
 
         if ($this->isSkippable($hash)) {
             return [];
@@ -55,9 +56,12 @@ class HashidsValueResolver implements ValueResolverInterface
         return [];
     }
 
-    private function hasHashidAttribute(ArgumentMetadata $argument): bool
+    private function getHashidAttribute(ArgumentMetadata $argument): ?Hashid
     {
-        return $argument->getAttributes(Hashid::class, ArgumentMetadata::IS_INSTANCEOF) !== [];
+        /** @var Hashid[] $attributes */
+        $attributes = $argument->getAttributes(Hashid::class, ArgumentMetadata::IS_INSTANCEOF);
+
+        return $attributes[0] ?? null;
     }
 
     /**
