@@ -29,7 +29,7 @@
   "require-dev": {
     "friends-of-phpspec/phpspec-expect": "^4.0",
     "friendsofphp/php-cs-fixer": "^3.2",
-    "phpmd/phpmd": "^2.10",
+    "phpmd/phpmd": "^3.0",
     "phpspec/phpspec": "^7.1 || ^8.0",
     "phpstan/phpstan": "^1.1",
     "phpstan/phpstan-symfony": "^1.0",
